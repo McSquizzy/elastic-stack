@@ -1,0 +1,108 @@
+version: "3.3"
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
+  default:
+    driver: bridge
+
+secrets:
+  elasticsearch.keystore:
+    file: ${ELK_DATA}/secrets/keystore/elasticsearch.keystore
+  elastic.ca:
+    file: ${ELK_DATA}/secrets/certs/ca/ca.crt
+  elasticsearch.certificate:
+    file: ${ELK_DATA}/secrets/certs/elasticsearch/elasticsearch.crt
+  elasticsearch.key:
+    file: ${ELK_DATA}/secrets/certs/elasticsearch/elasticsearch.key
+  kibana.certificate:
+    file: ${ELK_DATA}/secrets/certs/kibana/kibana.crt
+  kibana.key:
+    file: ${ELK_DATA}/secrets/certs/kibana/kibana.key
+
+services:
+
+####################################################################
+############################# ELK ##################################
+####################################################################
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    restart: unless-stopped
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTIC_CLUSTER_NAME: ${ELASTIC_CLUSTER_NAME}
+      ELASTIC_NODE_NAME: ${ELASTIC_NODE_NAME}
+      ELASTIC_INIT_MASTER_NODE: ${ELASTIC_INIT_MASTER_NODE}
+      ELASTIC_DISCOVERY_SEEDS: ${ELASTIC_DISCOVERY_SEEDS}
+      ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
+      bootstrap.memory_lock: "true"
+    volumes:
+      - ${ELK_DATA}/elasticsearch/data:/usr/share/elasticsearch/data
+      - ${ELK_DATA}/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${ELK_DATA}/elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+    secrets:
+      - source: elasticsearch.keystore
+        target: /usr/share/elasticsearch/config/elasticsearch.keystore
+      - source: elastic.ca
+        target: /usr/share/elasticsearch/config/certs/ca.crt
+      - source: elasticsearch.certificate
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.crt
+      - source: elasticsearch.key
+        target: /usr/share/elasticsearch/config/certs/elasticsearch.key
+    ports:
+      - 9200:9200
+      - 9300:9300
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 200000
+        hard: 200000
+    networks:
+      - traefik_proxy
+      
+  logstash:
+    container_name: logstash
+    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    restart: unless-stopped
+    volumes:
+      - ${ELK_DATA}/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ${ELK_DATA}/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      - ${ELK_DATA}/logstash/pipeline:/usr/share/logstash/pipeline
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP}"
+    ports:
+      - 5044:5044
+      - 9600:9600
+    networks:
+      - traefik_proxy
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    restart: unless-stopped
+    volumes:
+      - ${ELK_DATA}/kibana/config:/usr/share/kibana/config
+    environment:
+      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+    secrets:
+      - source: elastic.ca
+        target: /certs/ca.crt
+      - source: kibana.certificate
+        target: /certs/kibana.crt
+      - source: kibana.key
+        target: /certs/kibana.key
+    ports:
+      - 5601:5601
+    networks:
+      - traefik_proxy
