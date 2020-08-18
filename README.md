@@ -1,5 +1,10 @@
-# ELK-Stack Dockerized Setup
-Short description
+# Elastic-Stack Dockerized Setup
+The Elastic stack is the target for course progress logging and system availability logs. The NISLAB Elastic stack contains following three components:
+
+![alt text](https://www.elastic.co/guide/en/infrastructure/guide/current/images/monitoring-architecture.png "Elastic Stack Components")
+
+Diferent Beats gather their specified data and send it to elasticsearch (Example). Elasticsearch is a real-time, distributed storage, search, and analytics engine. We use Kibana to search, view, and interact with data stored in Elasticsearch.
+
 
 ## Setup
 1. Clone Repo
