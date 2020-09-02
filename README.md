@@ -19,18 +19,22 @@ Diferent Beats gather their specified data and send it to elasticsearch (Example
 # Components
 ## Elasticsearch
 **Host:** elasticsearch.nislab.eee.intern
+### Config
+`elasticsearch/config/elasticsearch.yml` Configures Elasticsearch. Should not be touched and no changes are necessery.
 
 ## Logstash
 **Host:** logstash.nislab.eee.intern
 ### Config
-`logstash/config/logstash.yml` Should not be touched and no changes are necessery
-`logstash/config/pipelines.yml` Registers pipelines using a defined config file
-`logstash/pipeline/main.yml` Each pipeline must have an `input`, `filter` and `output` tag. Input defines what data should be processed in the pipeline. Filter defines how the data should be processed. Output defines where the data should be sent.
+`logstash/config/logstash.yml` Should not be touched and no changes are necessery.
 
+`logstash/config/pipelines.yml` Registers pipelines using a defined config file.
+
+`logstash/pipeline/main.yml` Each pipeline must have an `input`, `filter` and `output` tag. Input defines what data should be processed in the pipeline. Filter defines how the data should be processed. Output defines where the data should be sent.
 
 ## Kibana
 **Host:** kibana.nislab.eee.intern
-
+### Config
+`kibana/config/kibana.yml` Configures Kibana. Should not be touched and no changes are necessery.
 
 
 
