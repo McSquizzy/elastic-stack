@@ -1,2 +1,7 @@
 .env
 elasticsearch/data/*
+secrets/certs/certs.zip
+secrets/certs/ca/*
+secrets/certs/elasticsearch/*
+secrets/certs/kibana/*
+secrets/keystore/*
