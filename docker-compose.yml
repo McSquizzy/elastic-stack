@@ -54,7 +54,6 @@ services:
       - source: elasticsearch.key
         target: /usr/share/elasticsearch/config/certs/elasticsearch.key
     ports:
-      - 9200:9200
       - 9300:9300
     ulimits:
       memlock:
@@ -65,6 +64,18 @@ services:
         hard: 200000
     networks:
       - traefik_proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.elasticsearch.loadbalancer.server.port=9200
+      - traefik.docker.network=traefik_proxy
+      - traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.nislab.eee.intern`)
+      - traefik.http.routers.elasticsearch.entrypoints=https
+      - traefik.http.routers.elasticsearch.tls=true
+      - traefik.http.middlewares.elasticsearch.headers.SSLRedirect=true
+      - traefik.http.middlewares.elasticsearch.headers.browserXSSFilter=true
+      - traefik.http.middlewares.elasticsearch.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.elasticsearch.headers.frameDeny=true
+      
       
   logstash:
     container_name: logstash
@@ -84,6 +95,20 @@ services:
       - 9600:9600
     networks:
       - traefik_proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.logstash.loadbalancer.server.port=5044
+      - traefik.docker.network=traefik_proxy
+      - traefik.http.routers.logstash.rule=Host(`logstash.nislab.eee.intern`)
+      - traefik.http.routers.logstash.entrypoints=https
+      - traefik.http.routers.logstash.tls=true
+      - traefik.http.middlewares.logstash.headers.SSLRedirect=true
+      - traefik.http.middlewares.logstash.headers.browserXSSFilter=true
+      - traefik.http.middlewares.logstash.headers.contentTypeNosniff=true
+      - traefik.http.middlewares.logstash.headers.frameDeny=true
+      - traefik.tcp.routers.logstash-tcp.rule=HostSNI(`*`)
+      - traefik.tcp.routers.logstash-tcp.entrypoints=logstash
+      - traefik.tcp.services.logstash-tcp.loadbalancer.server.port=5044
 
   kibana:
     container_name: kibana
@@ -102,7 +127,14 @@ services:
         target: /certs/kibana.crt
       - source: kibana.key
         target: /certs/kibana.key
-    ports:
-      - 5601:5601
     networks:
       - traefik_proxy
+    ports:
+      - 5601:5601
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.kibana.loadbalancer.server.port=5601
+      - traefik.docker.network=traefik_proxy
+      - traefik.http.routers.kibana.rule=Host(`kibana.nislab.eee.intern`)
+      - traefik.http.routers.kibana.entrypoints=https
+      - traefik.http.routers.kibana.tls=true

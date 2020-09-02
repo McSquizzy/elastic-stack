@@ -9,7 +9,8 @@ server.host: "0.0.0.0"
 elasticsearch.hosts: [ "http://${ELASTICSEARCH_HOST_PORT}" ]
 
 # SSL settings
-server.ssl.enabled: true
+# Re-evaluate if ssl.enabled = false is a good idea
+server.ssl.enabled: false
 server.ssl.certificate: /certs/kibana.crt
 server.ssl.key: /certs/kibana.key
 server.ssl.certificateAuthorities: [ "/certs/ca.crt" ]
