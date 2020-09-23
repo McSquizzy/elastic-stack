@@ -3,7 +3,7 @@ The Elastic stack is the target for course progress logging and system availabil
 
 ![alt text](https://www.elastic.co/guide/en/infrastructure/guide/current/images/monitoring-architecture.png "Elastic Stack Components")
 
-Diferent Beats gather their specified data and send it to elasticsearch (Example). Logstash is a processing pipeline which can be optionally used. Elasticsearch is a real-time, distributed storage, search, and analytics engine. We use Kibana to search, view, and interact with data stored in Elasticsearch.
+Diferent Beats gather their specified data and send it to elasticsearch. Logstash is a processing pipeline which can be optionally used. Elasticsearch is a real-time, distributed storage, search, and analytics engine. We use Kibana to search, view, and interact with data stored in Elasticsearch.
 
 
 # Setup
