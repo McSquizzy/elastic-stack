@@ -49,3 +49,33 @@ Ansible role for installation:
 # Elastic-Stack Usecases
 ## ISLAB linux client command logging
 Filebeat has been installed on each host using Ansible. The ISLAB Ansible role for the Linux client installs the Filebeat for Linux with the referenced configuration file ([LINK](https://gitlab.enterpriselab.ch/nislab/ansible/-/blob/master/islab.yml)). The installed Filebeat sends all logs to Logstash to filter out the necessary information ([LINK](https://gitlab.enterpriselab.ch/nislab/elastic-stack/-/blob/master/logstash/pipeline/main.conf)). 
+
+# Usefull Dev Tool Queries
+## Delete all
+```
+POST logstash-*/_delete_by_query
+{
+    "query": { 
+        "match_all": {}
+    }
+}
+```
+
+## Delete all documents after date
+```
+POST logstash-*/_delete_by_query
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2021-05-10 00:00:00.0",
+            "format": "yyyy-MM-dd HH:mm:ss.S"
+          }
+        }
+      }
+    }
+  }
+}
+```
