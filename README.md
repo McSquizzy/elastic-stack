@@ -1,15 +1,16 @@
 # Elastic-Stack Dockerized Setup
+
 This repo contains a ready to go elastic stack installation with tls activated.
 
-
 # Setup
+
 1. Clone Repo
-2. Adjust environment variables in .env (DO NOT CHANGE `ELASTIC_USERNAME`)
-3. Generate keys using `setup.docker-compose.yml` (`docker-compose -f setup.docker-compose.yml up`)
-4. Run main docker-compose file (`docker-compose up -d`)
-5. If elasticsearch container did not start sucessfully:
+1. Adjust environment variables in .env (DO NOT CHANGE `ELASTIC_USERNAME`)
+1. Generate keys using `setup.docker-compose.yml` (`docker-compose -f setup.docker-compose.yml up`)
+1. Run main docker-compose file (`docker-compose up -d`)
+1. If elasticsearch container did not start sucessfully:
     1. Set owner permissions on `elk-stack` directory (`sudo chown -R elk-stack $USER`)
-6. Set up [Beats](https://github.com/elastic/beats) to send data to elasticsearch or an elastic agent for endpoint security
+1. Set up [Beats](https://github.com/elastic/beats) to send data to elasticsearch or an elastic agent for endpoint security
  
 
 # Components
@@ -23,6 +24,7 @@ This repo contains a ready to go elastic stack installation with tls activated.
 `elasticsearch/config/elasticsearch.yml` Configures elasticsearch.
 
 ## Logstash
+
 **Host:** logstash
 
 ### Config
@@ -44,12 +46,10 @@ Filebeat is a logfile shipper which can send data to elasticsearch directly or v
 
 `kibana/config/kibana.yml` Configures Kibana.
 
-
 # Configuration
 
 ## Filebeat
 
 To test the filebeat config, run `filebeat test config`  
 to test the filebeat output, run `filebeat test output`
-
 

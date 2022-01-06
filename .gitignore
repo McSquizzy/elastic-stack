@@ -3,3 +3,4 @@ elasticsearch/data/*
 secrets/certs/certs.zip
 secrets/certs/*/
 secrets/keystore/*
+.DS_Store
