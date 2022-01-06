@@ -16,6 +16,9 @@ xpack.license.self_generated.type: basic
 # Security
 xpack.security.enabled: true
 
+# API Key Service
+xpack.security.authc.api_key.enabled: true
+
 ## - ssl
 xpack.security.transport.ssl.enabled: true
 xpack.security.transport.ssl.verification_mode: certificate
@@ -24,11 +27,11 @@ xpack.security.transport.ssl.certificate: certs/elasticsearch.crt
 xpack.security.transport.ssl.certificate_authorities: certs/ca.crt
 
 ## - http
-#xpack.security.http.ssl.enabled: true
-#xpack.security.http.ssl.key: certs/elasticsearch.key
-#xpack.security.http.ssl.certificate: certs/elasticsearch.crt
-#xpack.security.http.ssl.certificate_authorities: certs/ca.crt
-#xpack.security.http.ssl.client_authentication: optional
+xpack.security.http.ssl.enabled: true
+xpack.security.http.ssl.key: certs/elasticsearch.key
+xpack.security.http.ssl.certificate: certs/elasticsearch.crt
+xpack.security.http.ssl.certificate_authorities: certs/ca.crt
+xpack.security.http.ssl.client_authentication: optional
 
 # Monitoring
 xpack.monitoring.enabled: true

@@ -1,7 +1,7 @@
 # Exit on Error
 set -e
 
-OUTPUT_DIR=${ELK_DATA}/secrets/certs
+OUTPUT_DIR=${ELASTIC_DATA}/secrets/certs
 ZIP_FILE=$OUTPUT_DIR/certs.zip
 
 printf "======= Generating Elastic Stack Certificates =======\n"

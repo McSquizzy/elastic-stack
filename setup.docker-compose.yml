@@ -3,20 +3,19 @@ version: '3.3'
 services:
 
   keystore:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     command: bash /setup/setup-keystore.sh
-#    command: tail -F anything
     volumes:
-        - ${ELK_DATA}/secrets:/secrets/
-        - ${ELK_DATA}/setup/:/setup/
+        - ${ELASTIC_DATA}/secrets:/secrets/
+        - ${ELASTIC_DATA}/setup/:/setup/
     user: "0"
     environment:
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
 
   certs:
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     command: bash /setup/setup-certs.sh
     user: "0"
     volumes:
-      - ${ELK_DATA}/secrets:/secrets/
-      - ${ELK_DATA}/setup/:/setup/
+      - ${ELASTIC_DATA}/secrets:/secrets/
+      - ${ELASTIC_DATA}/setup/:/setup/

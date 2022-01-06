@@ -1,35 +1,28 @@
 version: "3.3"
 
-networks:
-  traefik_proxy:
-    external:
-      name: traefik_proxy
-  default:
-    driver: bridge
-
 secrets:
   elasticsearch.keystore:
-    file: ${ELK_DATA}/secrets/keystore/elasticsearch.keystore
+    file: ${ELASTIC_DATA}/secrets/keystore/elasticsearch.keystore
   elastic.ca:
-    file: ${ELK_DATA}/secrets/certs/ca/ca.crt
+    file: ${ELASTIC_DATA}/secrets/certs/ca/ca.crt
   elasticsearch.certificate:
-    file: ${ELK_DATA}/secrets/certs/elasticsearch/elasticsearch.crt
+    file: ${ELASTIC_DATA}/secrets/certs/elasticsearch/elasticsearch.crt
   elasticsearch.key:
-    file: ${ELK_DATA}/secrets/certs/elasticsearch/elasticsearch.key
+    file: ${ELASTIC_DATA}/secrets/certs/elasticsearch/elasticsearch.key
   kibana.certificate:
-    file: ${ELK_DATA}/secrets/certs/kibana/kibana.crt
+    file: ${ELASTIC_DATA}/secrets/certs/kibana/kibana.crt
   kibana.key:
-    file: ${ELK_DATA}/secrets/certs/kibana/kibana.key
+    file: ${ELASTIC_DATA}/secrets/certs/kibana/kibana.key
 
 services:
 
 ####################################################################
-############################# ELK ##################################
+######################## ELASTIC STACK #############################
 ####################################################################
 
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:${ELK_VERSION}
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     restart: unless-stopped
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
@@ -41,9 +34,9 @@ services:
       ES_JAVA_OPTS: -Xmx${ELASTICSEARCH_HEAP} -Xms${ELASTICSEARCH_HEAP} -Des.enforce.bootstrap.checks=true
       bootstrap.memory_lock: "true"
     volumes:
-      - ${ELK_DATA}/elasticsearch/data:/usr/share/elasticsearch/data
-      - ${ELK_DATA}/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
-      - ${ELK_DATA}/elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
+      - ${ELASTIC_DATA}/elasticsearch/data:/usr/share/elasticsearch/data
+      - ${ELASTIC_DATA}/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ${ELASTIC_DATA}/elasticsearch/config/log4j2.properties:/usr/share/elasticsearch/config/log4j2.properties
     secrets:
       - source: elasticsearch.keystore
         target: /usr/share/elasticsearch/config/elasticsearch.keystore
@@ -54,7 +47,7 @@ services:
       - source: elasticsearch.key
         target: /usr/share/elasticsearch/config/certs/elasticsearch.key
     ports:
-      - 9300:9300
+      - 9200:9200
     ulimits:
       memlock:
         soft: -1
@@ -62,60 +55,30 @@ services:
       nofile:
         soft: 200000
         hard: 200000
-    networks:
-      - traefik_proxy
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.elasticsearch.loadbalancer.server.port=9200
-      - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.elasticsearch.rule=Host(`elasticsearch.nislab.eee.intern`)
-      - traefik.http.routers.elasticsearch.entrypoints=https
-      - traefik.http.routers.elasticsearch.tls=true
-      - traefik.http.middlewares.elasticsearch.headers.SSLRedirect=true
-      - traefik.http.middlewares.elasticsearch.headers.browserXSSFilter=true
-      - traefik.http.middlewares.elasticsearch.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.elasticsearch.headers.frameDeny=true
       
-      
-  logstash:
-    container_name: logstash
-    image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
-    restart: unless-stopped
-    volumes:
-      - ${ELK_DATA}/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
-      - ${ELK_DATA}/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
-      - ${ELK_DATA}/logstash/pipeline:/usr/share/logstash/pipeline
-    environment:
-      ELASTIC_USERNAME: ${ELASTIC_USERNAME}
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
-      ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
-      LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP}"
-    ports:
-      - 5044:5044
-      - 9600:9600
-    networks:
-      - traefik_proxy
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.logstash.loadbalancer.server.port=5044
-      - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.logstash.rule=Host(`logstash.nislab.eee.intern`)
-      - traefik.http.routers.logstash.entrypoints=https
-      - traefik.http.routers.logstash.tls=true
-      - traefik.http.middlewares.logstash.headers.SSLRedirect=true
-      - traefik.http.middlewares.logstash.headers.browserXSSFilter=true
-      - traefik.http.middlewares.logstash.headers.contentTypeNosniff=true
-      - traefik.http.middlewares.logstash.headers.frameDeny=true
-      - traefik.tcp.routers.logstash-tcp.rule=HostSNI(`*`)
-      - traefik.tcp.routers.logstash-tcp.entrypoints=logstash
-      - traefik.tcp.services.logstash-tcp.loadbalancer.server.port=5044
+  #logstash:
+    #container_name: logstash
+    #image: docker.elastic.co/logstash/logstash:${ELK_VERSION}
+    #restart: unless-stopped
+    #volumes:
+      #- ${ELASTIC_DATA}/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      #- ${ELASTIC_DATA}/logstash/config/pipelines.yml:/usr/share/logstash/config/pipelines.yml
+      #- ${ELASTIC_DATA}/logstash/pipeline:/usr/share/logstash/pipeline
+    #environment:
+      #ELASTIC_USERNAME: ${ELASTIC_USERNAME}
+      #ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
+      #ELASTICSEARCH_HOST_PORT: ${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}
+      #LS_JAVA_OPTS: "-Xmx${LOGSTASH_HEAP} -Xms${LOGSTASH_HEAP}"
+    #ports:
+      #- 5044:5044
+      #- 9600:9600
 
   kibana:
     container_name: kibana
-    image: docker.elastic.co/kibana/kibana:${ELK_VERSION}
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     restart: unless-stopped
     volumes:
-      - ${ELK_DATA}/kibana/config:/usr/share/kibana/config
+      - ${ELASTIC_DATA}/kibana/config:/usr/share/kibana/config
     environment:
       ELASTIC_USERNAME: ${ELASTIC_USERNAME}
       ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
@@ -127,14 +90,5 @@ services:
         target: /certs/kibana.crt
       - source: kibana.key
         target: /certs/kibana.key
-    networks:
-      - traefik_proxy
     ports:
       - 5601:5601
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.kibana.loadbalancer.server.port=5601
-      - traefik.docker.network=traefik_proxy
-      - traefik.http.routers.kibana.rule=Host(`kibana.nislab.eee.intern`)
-      - traefik.http.routers.kibana.entrypoints=https
-      - traefik.http.routers.kibana.tls=true

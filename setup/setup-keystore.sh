@@ -1,7 +1,7 @@
 # Exit on Error
 set -e
 
-OUTPUT_FILE=${ELK_DATA}/secrets/keystore/elasticsearch.keystore
+OUTPUT_FILE=${ELASTIC_DATA}/secrets/keystore/elasticsearch.keystore
 NATIVE_FILE=/usr/share/elasticsearch/config/elasticsearch.keystore
 
 # Password Generate

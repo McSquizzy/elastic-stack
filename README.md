@@ -1,9 +1,5 @@
 # Elastic-Stack Dockerized Setup
-The Elastic stack is the target for course progress logging and system availability logs. The NISLAB Elastic stack contains following three components:
-
-![alt text](https://www.elastic.co/guide/en/infrastructure/guide/current/images/monitoring-architecture.png "Elastic Stack Components")
-
-Diferent Beats gather their specified data and send it to elasticsearch. Logstash is a processing pipeline which can be optionally used. Elasticsearch is a real-time, distributed storage, search, and analytics engine. We use Kibana to search, view, and interact with data stored in Elasticsearch.
+This repo contains a ready to go elastic stack installation with tls activated.
 
 
 # Setup
@@ -13,69 +9,47 @@ Diferent Beats gather their specified data and send it to elasticsearch. Logstas
 4. Run main docker-compose file (`docker-compose up -d`)
 5. If elasticsearch container did not start sucessfully:
     1. Set owner permissions on `elk-stack` directory (`sudo chown -R elk-stack $USER`)
-6. Set up different [Beats](https://github.com/elastic/beats) to send data to elasticsearch
+6. Set up [Beats](https://github.com/elastic/beats) to send data to elasticsearch or an elastic agent for endpoint security
  
 
 # Components
+
 ## Elasticsearch
-**Host:** elasticsearch.nislab.eee.intern
+
+**Host:** elasticsearch
+
 ### Config
-`elasticsearch/config/elasticsearch.yml` Configures Elasticsearch. Should not be touched and no changes are necessery.
+
+`elasticsearch/config/elasticsearch.yml` Configures elasticsearch.
 
 ## Logstash
-**Host:** logstash.nislab.eee.intern
+**Host:** logstash
+
 ### Config
-`logstash/config/logstash.yml` Should not be touched and no changes are necessery.
 
-`logstash/config/pipelines.yml` Registers pipelines using a defined config file.
-
+`logstash/config/logstash.yml`  
+`logstash/config/pipelines.yml` Registers pipelines using a defined config file.  
 `logstash/pipeline/main.yml` Each pipeline must have an `input`, `filter` and `output` tag. Input defines what data should be processed in the pipeline. Filter defines how the data should be processed. Output defines where the data should be sent.
 
 ## Filebeat
-Filebeat is a logfile shipper which can send data to elasticsearch directly or via Logstash to aggregate data. Filebeata must be installed on each client which should send data to elasticsearch. 
-Ansible role for installation:
-- [Windows](https://gitlab.enterpriselab.ch/nislab/ansible/-/blob/master/roles/filebeat_configure/tasks/windows.yml)
-- [Linux](https://gitlab.enterpriselab.ch/nislab/ansible/-/blob/master/roles/filebeat_configure/tasks/linux.yml)
 
+Filebeat is a logfile shipper which can send data to elasticsearch directly or via Logstash to aggregate data. Filebeata must be installed on each client which should send data to elasticsearch. 
 
 
 ## Kibana
-**Host:** kibana.nislab.eee.intern
+
+**Host:** kibana
+
 ### Config
-`kibana/config/kibana.yml` Configures Kibana. Should not be touched and no changes are necessery.
+
+`kibana/config/kibana.yml` Configures Kibana.
 
 
+# Configuration
 
-# Elastic-Stack Usecases
-## ISLAB linux client command logging
-Filebeat has been installed on each host using Ansible. The ISLAB Ansible role for the Linux client installs the Filebeat for Linux with the referenced configuration file ([LINK](https://gitlab.enterpriselab.ch/nislab/ansible/-/blob/master/islab.yml)). The installed Filebeat sends all logs to Logstash to filter out the necessary information ([LINK](https://gitlab.enterpriselab.ch/nislab/elastic-stack/-/blob/master/logstash/pipeline/main.conf)). 
+## Filebeat
 
-# Usefull Dev Tool Queries
-## Delete all
-```
-POST logstash-*/_delete_by_query
-{
-    "query": { 
-        "match_all": {}
-    }
-}
-```
+To test the filebeat config, run `filebeat test config`  
+to test the filebeat output, run `filebeat test output`
 
-## Delete all documents after date
-```
-POST logstash-*/_delete_by_query
-{
-  "query": {
-    "bool": {
-      "filter": {
-        "range": {
-          "timestamp": {
-            "gte": "2021-05-10 00:00:00.0",
-            "format": "yyyy-MM-dd HH:mm:ss.S"
-          }
-        }
-      }
-    }
-  }
-}
-```
+
